@@ -3,3 +3,29 @@ body {
   font-family : "IBM Plex Mono",monospace; /*monospace means every character takes the same amount of space*/
   background-color: #ffffff; /*full white*/
 }
+
+.choices { /*copied the styling*/
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  button {
+    background-color: #f0f0f0; /* Light grey background */
+    color: #333; /* Dark grey text */
+    padding: 10px 20px; /* Spacing inside the button */
+    border: none; /* Remove default border */
+    cursor: pointer; /* Indicate it's clickable */
+    font-family: sans-serif; /* Simple font */
+    font-size: 16px; /* Readable text size */
+
+    /* Rounded corners */
+    border-radius: 5px;
+  }
+}
+
+.menu {
+  display: flex;
+  flex-direction:row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap:20px;
+}
