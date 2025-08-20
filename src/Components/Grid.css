@@ -1,0 +1,11 @@
+.grid {
+    /* using flexbox i'm more familiar with it*/
+    display: flex;
+    flex-direction:column;
+    margin-top: 20px;
+}
+
+.grid-row {
+    /* makes the nodes in the grid go side by side*/
+    display: flex;
+}

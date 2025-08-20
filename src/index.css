@@ -1,0 +1,5 @@
+/* creating the default theme for the app*/
+body {
+  font-family : "IBM Plex Mono",monospace; /*monospace means every character takes the same amount of space*/
+  background-color: #ffffff; /*full white*/
+}
