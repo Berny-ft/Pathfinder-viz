@@ -10,3 +10,9 @@
 .node-start{
     background-color:deepskyblue;
 }
+.node-end{
+    background-color:indianred;
+}
+.node-obs{
+    background-color:black;
+}
