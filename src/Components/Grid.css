@@ -5,7 +5,10 @@
     margin-top: 20px;
 }
 
+
+
 .grid-row {
     /* makes the nodes in the grid go side by side*/
     display: flex;
 }
+
