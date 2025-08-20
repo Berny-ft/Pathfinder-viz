@@ -4,6 +4,8 @@ import Node from "./Node.jsx";
 
 import './Grid.css' // importing the styling for the grid
 
+
+
 const ROWS = 20;
 const COLS = 50;
 
@@ -42,6 +44,29 @@ const Grid = ()=> {// correct name is needed here
     // use state to store the grid and the edit function associated with it
     const[grid, setGrid] = useState([]) // the grid begins empty but then we associate the initialize to it
 
+    const [startNode, setStartNode] = useState({row:null,col:null});
+
+   // if the node is clicked it tells it to the grid through on lick
+    function HandleNodeClick(row,col){
+        const newGrid = grid.map(gridRow => gridRow.slice()); // slice used to copy here
+
+        if (startNode.row != null){ // if it was already selected we deselect
+            const prevStartNode = newGrid[startNode.row][startNode.col]
+            prevStartNode.isStart = false;
+        }
+
+
+        const clickedNode = newGrid[row][col]
+        clickedNode.isStart = true;
+
+        setStartNode({row,col})
+
+        setGrid(newGrid)
+    }
+
+
+
+
     // use effect used to run code only when we mount the component so we use it to initialize the grid
     useEffect(()=>{
         setGrid(initializeGrid());
@@ -56,8 +81,8 @@ const Grid = ()=> {// correct name is needed here
                     <div key={rowIndex} className='grid-row'>
                         {/*within each row we want to render each Node*/}
                         {row.map((node,nodeIndex)=>{
-                            const {row, col} = node // from each node object in the grid we destructure to take their col and row
-                            return (<Node key={nodeIndex} row={row} col={col}></Node>)
+                            const {row, col,isStart} = node // from each node object in the grid we destructure to take their col and row
+                            return (<Node key={nodeIndex} row={row} col={col} isStart={isStart} onNodeClick={HandleNodeClick}></Node>)
                         })}
                     </div>
 
