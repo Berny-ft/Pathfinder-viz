@@ -8,18 +8,20 @@ body {
   display: flex;
   flex-direction: row;
   gap: 20px;
-  button {
-    background-color: #f0f0f0; /* Light grey background */
-    color: #333; /* Dark grey text */
-    padding: 10px 20px; /* Spacing inside the button */
-    border: none; /* Remove default border */
-    cursor: pointer; /* Indicate it's clickable */
-    font-family: sans-serif; /* Simple font */
-    font-size: 16px; /* Readable text size */
 
-    /* Rounded corners */
-    border-radius: 5px;
-  }
+}
+
+.choices button {
+  background-color: #f0f0f0; /* Light grey background */
+  color: #333; /* Dark grey text */
+  padding: 10px 20px; /* Spacing inside the button */
+  border: none; /* Remove default border */
+  cursor: pointer; /* Indicate it's clickable */
+  font-family: sans-serif; /* Simple font */
+  font-size: 16px; /* Readable text size */
+
+  /* Rounded corners */
+  border-radius: 5px;
 }
 
 .menu {
@@ -28,4 +30,9 @@ body {
   flex-wrap: wrap;
   align-items: center;
   gap:20px;
+}
+
+.choices .startStyling {
+  background-color: deepskyblue;
+
 }

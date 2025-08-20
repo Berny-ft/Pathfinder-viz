@@ -1,12 +1,12 @@
 .node {
     width:25px;
     height:25px;
-    outline: 1px solid rgb(175,216,248);
+    outline: 1px solid rgba(15, 98, 254, 0.58);
     display: inline-block;
     border-radius: .5em;
 
 }
 
 .node-start{
-    background-color:#2ecc71;
+    background-color:deepskyblue;
 }

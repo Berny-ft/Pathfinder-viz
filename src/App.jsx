@@ -1,10 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Grid from "./Components/Grid.jsx";
 
 function App() {
+    const[startChoice, editStartChoice] = useState(false)
 
 
-  return (
+    function handleStartChoice(){
+        const start = startChoice === false
+        editStartChoice(start)
+    }
+
+    return (
     <>
       <h1>Pathfinding visualizer</h1>
 
@@ -16,14 +22,14 @@ function App() {
         <input type="radio" name="type"/>
         </label>
         <div className="choices">
-        <button>Set Start</button>
+        <button className={startChoice ? "startStyling" : ''} onClick={handleStartChoice}>Set Start</button>
         <button>Set End</button>
         <button>Set walls</button>
         <button>RUN</button>
         </div>
         </div>
 
-        <Grid/> {/*self contained component */}
+        <Grid setStartChoice={startChoice}/> {/*self contained component */}
 
     </>
   )

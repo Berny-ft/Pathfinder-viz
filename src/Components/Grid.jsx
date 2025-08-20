@@ -40,7 +40,7 @@ const initializeGrid = () =>{
 };
 
 
-const Grid = ()=> {// correct name is needed here
+const Grid = ({setStartChoice})=> {// correct name is needed here
     // use state to store the grid and the edit function associated with it
     const[grid, setGrid] = useState([]) // the grid begins empty but then we associate the initialize to it
 
@@ -48,20 +48,22 @@ const Grid = ()=> {// correct name is needed here
 
    // if the node is clicked it tells it to the grid through on lick
     function HandleNodeClick(row,col){
-        const newGrid = grid.map(gridRow => gridRow.slice()); // slice used to copy here
+        if (setStartChoice) {
+            const newGrid = grid.map(gridRow => gridRow.slice()); // slice used to copy here
 
-        if (startNode.row != null){ // if it was already selected we deselect
-            const prevStartNode = newGrid[startNode.row][startNode.col]
-            prevStartNode.isStart = false;
+            if (startNode.row != null) { // if it was already selected we deselect
+                const prevStartNode = newGrid[startNode.row][startNode.col]
+                prevStartNode.isStart = false;
+            }
+
+
+            const clickedNode = newGrid[row][col]
+            clickedNode.isStart = true;
+
+            setStartNode({row, col})
+
+            setGrid(newGrid)
         }
-
-
-        const clickedNode = newGrid[row][col]
-        clickedNode.isStart = true;
-
-        setStartNode({row,col})
-
-        setGrid(newGrid)
     }
 
 
