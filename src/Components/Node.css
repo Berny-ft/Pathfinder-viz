@@ -16,3 +16,7 @@
 .node-obs{
     background-color:black;
 }
+
+.node-visited{
+    background-color:yellow;
+}

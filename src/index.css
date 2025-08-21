@@ -42,5 +42,11 @@ body {
 }
 .choices .obsStyling {
   background-color: black;
+  color: white;
+
+
+}
+.choices .runStyling {
+  background-color: lawngreen;
 
 }

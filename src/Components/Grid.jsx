@@ -11,14 +11,14 @@ const COLS = 50;
 
 // helper function to create the initial grid data structure
 // we need it to be based on the function since it occurs when the page is loaded
-const initializeGrid = () =>{
+function initializeGrid() {
     const grid  = [];
 
     for (let row = 0 ; row < ROWS; row++){
         const CurrentRow = [];
         for (let col  = 0 ; col < COLS;  col++){
-            // so each node does have its own properties (its an object) and we've just defined it using its positoin
-            // we aadding to eah row all the column nodes associated to that row
+            // so each node does have its own properties (it's an object) and we've just defined it using its position
+            // we're adding to eah row all the column nodes associated to that row
             CurrentRow.push(
                 // we are pushing an object
                 {
@@ -27,7 +27,6 @@ const initializeGrid = () =>{
                     isEnd: false, // again if it is the end of the search
                     isObstacle: false,
                     isVisited: false,
-
                     previousNode:null, //
 
                 }
@@ -37,17 +36,24 @@ const initializeGrid = () =>{
     }
 
     return grid;
-};
+}
 
 
-const Grid = ({setStartChoice,setEndChoice,setObs})=> {// correct name is needed here
+
+
+const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// correct name is needed here
     // use state to store the grid and the edit function associated with it
-    const[grid, setGrid] = useState([]) // the grid begins empty but then we associate the initialize to it
-
+    const[grid, setGrid] = useState([]) // the grid begins empty, but then we associate then initialize to it
     const [startNode, setStartNode] = useState({row:null,col:null});
     const [endNode, setEndNode] = useState({row:null,col:null});
 
-   // if the node is clicked it tells it to the grid through on lick
+    // use effect used to run code only when we mount the component so we use it to initialize the grid
+    useEffect(()=>{
+        setGrid(initializeGrid());
+    },[]) // the empty array as dependency means that it only runs one since the array can never change
+
+
+    // if the node is clicked it tells it to the grid through on lick
     function HandleNodeClick(row,col){
         if (setStartChoice) {
             const newGrid = grid.map(gridRow => gridRow.slice()); // slice used to copy here
@@ -93,14 +99,81 @@ const Grid = ({setStartChoice,setEndChoice,setObs})=> {// correct name is needed
         }
     }
 
+    useEffect(() => {
+        if (startNode.row !== null && endNode.col !== null) {
+            if (setRun){
+                if (setSearchType === 'DFS'){
+                    DFS()
+                }else if (setSearchType === "BFS"){
+                    BFS()
+                }
+            }
+
+        }
+    }, [setRun]);
 
 
 
-    // use effect used to run code only when we mount the component so we use it to initialize the grid
-    useEffect(()=>{
-        setGrid(initializeGrid());
-    },[]) // the empty array as dependency means that it only runs one since the array can never change
+    // gotta figure this out I still don't get it
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    async function DFS(){
 
+
+
+
+
+        let row  = startNode.row;
+        let col = startNode.col;
+
+        let visitedLog = grid.map(gridRow => gridRow.slice());
+        visitedLog[row][col].isVisited = true;
+
+        const MIN = 0
+        const MAXROWS = ROWS-1
+        const MAXCOLS = COLS-1
+
+        let cnt = 0
+        while(cnt < 20){
+
+
+
+           // if up is not out of bounds nor obstacle set current node to previous
+            // go up and set it to current push currentnode in the stack  if current is the end. break
+            // you could pop c
+            // else the same for right
+            // else the same of down
+            // else the same for left
+            // else pop current from the stack  use its
+            // each node has a previous
+            // after each rul timeout of 20ms do nothing
+
+            // up
+            if (endNode.row === row && endNode.col === col){
+                break;
+            }
+
+            if ( MAXROWS >=row-1>= MIN && !visitedLog[row-1][col].isObstacle){
+                row = row-1
+                visitedLog[row][col].isVisited = true
+                visitedLog[row][col].previousNode = visitedLog[row-1][col]
+
+                await delay(200);
+
+                // re render
+                setGrid(visitedLog)
+
+
+
+            }
+
+            cnt++
+
+        }
+
+    }
+    function BFS(){
+        //
+    }
 
     return (
         <div className='grid'>
@@ -110,8 +183,8 @@ const Grid = ({setStartChoice,setEndChoice,setObs})=> {// correct name is needed
                     <div key={rowIndex} className='grid-row'>
                         {/*within each row we want to render each Node*/}
                         {row.map((node,nodeIndex)=>{
-                            const {row, col,isStart, isEnd, isObstacle} = node // from each node object in the grid we destructure to take their col and row
-                            return (<Node key={nodeIndex} row={row} col={col} isStart={isStart} isEnd={isEnd} isObstacle={isObstacle} onNodeClick={HandleNodeClick}></Node>)
+                            const {row, col,isStart, isEnd, isObstacle, isVisited} = node // from each node object in the grid we destructure to take their col and row
+                            return (<Node key={nodeIndex} row={row} col={col} isStart={isStart} isEnd={isEnd} isObstacle={isObstacle} isVisited={isVisited} onNodeClick={HandleNodeClick}></Node>)
                         })}
                     </div>
 
