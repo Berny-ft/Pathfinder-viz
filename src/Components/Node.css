@@ -7,6 +7,10 @@
 
 }
 
+.node-visited{
+    background-color:yellow;
+}
+
 .node-start{
     background-color:deepskyblue;
 }
@@ -17,6 +21,3 @@
     background-color:black;
 }
 
-.node-visited{
-    background-color:yellow;
-}
