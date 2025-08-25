@@ -5,9 +5,9 @@ import Node from "./Node.jsx";
 import './Grid.css' // importing the styling for the grid
 
 
-
+// dimensions of the grid
 const ROWS = 20;
-const COLS = 50;
+const COLS = 20;
 
 // helper function to create the initial grid data structure
 // we need it to be based on the function since it occurs when the page is loaded
@@ -53,19 +53,23 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// c
     },[]) // the empty array as dependency means that it only runs one since the array can never change
 
 
-    // if the node is clicked it tells it to the grid through on lick
+    // if the node is clicked it tells it to the grid through on link
     function HandleNodeClick(row,col){
         if (setStartChoice) {
             const newGrid = grid.map(gridRow => gridRow.slice()); // slice used to copy here
 
-            if (startNode.row != null) { // if it was already selected we deselect
+            if (startNode.row != null) { // if it was already selected (we already have a start somewhere) we deselect
                 const prevStartNode = newGrid[startNode.row][startNode.col]
                 prevStartNode.isStart = false;
+                prevStartNode.isVisited = false;
+
             }
 
 
             const clickedNode = newGrid[row][col]
+            clickedNode.isVisited = true;
             clickedNode.isStart = true;
+
 
             setStartNode({row, col})
 
@@ -114,7 +118,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// c
 
 
 
-    // gotta figure this out I still don't get it
+    // got to figure this out I still don't get it
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
     async function DFS(){
 
@@ -125,48 +129,92 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// c
         let row  = startNode.row;
         let col = startNode.col;
 
-        let visitedLog = grid.map(gridRow => gridRow.slice());
-        visitedLog[row][col].isVisited = true;
+
+        //visitedLog[row][col].isVisited = true;
 
         const MIN = 0
         const MAXROWS = ROWS-1
         const MAXCOLS = COLS-1
 
-        let cnt = 0
-        while(cnt < 20){
+
+
+        while(true){
 
 
 
            // if up is not out of bounds nor obstacle set current node to previous
-            // go up and set it to current push currentnode in the stack  if current is the end. break
+            // go up and set it to current push current node in the stack  if current is the end. break
             // you could pop c
             // else the same for right
             // else the same of down
             // else the same for left
-            // else pop current from the stack  use its
+            // else pop current from the stack  use it
             // each node has a previous
             // after each rul timeout of 20ms do nothing
 
-            // up
-            if (endNode.row === row && endNode.col === col){
+            // keeping track of positioning
+            const prevRow = row;
+            const prevCol = col;
+
+            // creating the new grid to edit
+            const visitedLog = grid.map(gridRow => gridRow.slice());
+
+            const boundsCheckUp = MAXROWS >=row-1 && row-1>= MIN  && MAXCOLS >=col && col>= MIN
+            const boundsCheckDown = MAXROWS >=row+1 && row+1>= MIN  && MAXCOLS >=col && col>= MIN
+            const boundsCheckRight = MAXROWS >=row && row>= MIN  && MAXCOLS >=col+1 && col+1>= MIN
+            const boundsCheckLeft = MAXROWS >=row && row>= MIN  && MAXCOLS >=col-1 && col-1>= MIN
+            if (endNode.row === row && endNode.col === col){ // stopping condition if the end is reached
+                alert("Solved")
                 break;
-            }
+            } else if ( boundsCheckUp && !grid[row-1][col].isObstacle && !grid[row-1][col].isVisited){ // bounds checking when moving upwards
+                console.log("moving up")
 
-            if ( MAXROWS >=row-1>= MIN && !visitedLog[row-1][col].isObstacle){
                 row = row-1
-                visitedLog[row][col].isVisited = true
-                visitedLog[row][col].previousNode = visitedLog[row-1][col]
 
-                await delay(200);
+                visitedLog[row][col].isVisited = true
+                visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
 
                 // re render
-                setGrid(visitedLog)
 
 
+            } else if (boundsCheckRight && !grid[row][col+1].isObstacle && !grid[row][col+1].isVisited){// bounds checking when moving right
+                console.log("moving right")
+                col = col+1
+                visitedLog[row][col].isVisited = true
+                visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
+
+
+
+            } else if (boundsCheckDown && !grid[row+1][col].isObstacle &&  !grid[row+1][col].isVisited){
+                row = row+1
+
+                visitedLog[row][col].isVisited = true
+                visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
+            } else if (boundsCheckLeft && !grid[row][col-1].isObstacle && !grid[row][col-1].isVisited) {// bounds checking when moving right
+                console.log("moving right")
+                col = col - 1
+                visitedLog[row][col].isVisited = true
+                visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
+            }else if(grid[row][col].previousNode.row === startNode.row && grid[row][col].previousNode.col === startNode.col){
+                alert("No solution found")
+                break;
+            } else {// backtrack
+                row  = grid[row][col].previousNode.row
+                col  = grid[row][col].previousNode.col
 
             }
 
-            cnt++
+
+
+
+
+            // rerender
+            setGrid(visitedLog)
+            await delay(5);
+
+
+
+
 
         }
 

@@ -7,6 +7,7 @@ body {
 .choices { /*copied the styling*/
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   gap: 20px;
 
 }
@@ -49,4 +50,11 @@ body {
 .choices .runStyling {
   background-color: lawngreen;
 
+}
+
+.node-data{
+  padding: 0;
+
+
+  list-style-type:disc ;
 }

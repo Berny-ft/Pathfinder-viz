@@ -64,11 +64,24 @@ function App() {
         <button className={`${setObs ? "obsStyling" : ""}`} onClick={handleEditObs}>Set Obstacles</button>
         <button className={ `${setRun ? "runStyling": ""}`} onClick={handleRun}>RUN</button>
         <button onClick={()=> location.reload()}>RESET</button>
+
         </div>
+
         </div>
+
 
         <Grid setStartChoice={startChoice} setEndChoice={endChoice} setObs={setObs} setRun={setRun} setSearchType={searchType}/> {/*self contained component */}
+        <br/>
+        <div><b>Node data</b> <ul className="node-data">
 
+            <li>X: <span>Null</span></li>
+            <li>Y: <span>Null</span></li>
+            <li>Start: <span>Null</span></li>
+            <li>End: <span>Null</span></li>
+            <li>Obstacle: <span>Null</span></li>
+            <li>Visited: <span>Null</span></li>
+        </ul>
+        </div>
     </>
   )
 }
