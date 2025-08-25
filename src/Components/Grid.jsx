@@ -137,7 +137,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// c
         const MAXCOLS = COLS-1
 
 
-
+        let cnt = 1
         while(true){
 
 
@@ -164,10 +164,10 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// c
             const boundsCheckRight = MAXROWS >=row && row>= MIN  && MAXCOLS >=col+1 && col+1>= MIN
             const boundsCheckLeft = MAXROWS >=row && row>= MIN  && MAXCOLS >=col-1 && col-1>= MIN
             if (endNode.row === row && endNode.col === col){ // stopping condition if the end is reached
-                alert("Solved")
+                alert(`Solved, explored ${cnt}/${ROWS*COLS} Nodes`)
                 break;
             } else if ( boundsCheckUp && !grid[row-1][col].isObstacle && !grid[row-1][col].isVisited){ // bounds checking when moving upwards
-                console.log("moving up")
+                cnt++;
 
                 row = row-1
 
@@ -178,7 +178,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// c
 
 
             } else if (boundsCheckRight && !grid[row][col+1].isObstacle && !grid[row][col+1].isVisited){// bounds checking when moving right
-                console.log("moving right")
+                cnt++
                 col = col+1
                 visitedLog[row][col].isVisited = true
                 visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
@@ -186,17 +186,18 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// c
 
 
             } else if (boundsCheckDown && !grid[row+1][col].isObstacle &&  !grid[row+1][col].isVisited){
+                cnt++
                 row = row+1
 
                 visitedLog[row][col].isVisited = true
                 visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
             } else if (boundsCheckLeft && !grid[row][col-1].isObstacle && !grid[row][col-1].isVisited) {// bounds checking when moving right
-                console.log("moving right")
+                cnt++
                 col = col - 1
                 visitedLog[row][col].isVisited = true
                 visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
             }else if(grid[row][col].previousNode.row === startNode.row && grid[row][col].previousNode.col === startNode.col){
-                alert("No solution found")
+                alert(`No solution found explored ${cnt}/${ROWS*COLS} Nodes`)
                 break;
             } else {// backtrack
                 row  = grid[row][col].previousNode.row
@@ -219,8 +220,82 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// c
         }
 
     }
-    function BFS(){
+    async function BFS(){
         //
+
+
+
+
+        const MIN = 0
+        const MAXROWS = ROWS-1
+        const MAXCOLS = COLS-1
+
+        let cnt = 1;
+
+        const queue = [{row:startNode.row,col:startNode.col}] // this is a bad queue but meh
+        while(queue.length !== 0){
+
+            // keeping track of the grid
+            const visitedLog = grid.map(r => r.slice())
+
+            //push the 4 edges if available to the queue
+            const first = queue.shift();
+            // up
+            if (MAXROWS >= first.row - 1 && first.row - 1 >= MIN && !grid[first.row - 1][first.col].isVisited && !grid[first.row - 1][first.col].isObstacle) {
+                if (first.row - 1 === endNode.row && first.col === endNode.col) {
+                    alert(`Solved, explored ${cnt}/${ROWS*COLS} Nodes`)
+                    break; // we found the end
+                }
+                queue.push({ row: first.row - 1, col: first.col });
+                visitedLog[first.row - 1][first.col].isVisited = true
+                cnt++
+            }
+
+// down
+            if (MAXROWS >= first.row + 1 && first.row + 1 >= MIN && !grid[first.row + 1][first.col].isVisited && !grid[first.row + 1][first.col].isObstacle) {
+                if (first.row + 1 === endNode.row && first.col === endNode.col) {
+                    alert(`Solved, explored ${cnt}/${ROWS*COLS} Nodes`)
+                    break; // we found the end
+                }
+                queue.push({ row: first.row + 1, col: first.col });
+                visitedLog[first.row + 1][first.col].isVisited = true
+                cnt++
+            }
+
+// right
+            if (MAXCOLS >= first.col + 1 && first.col + 1 >= MIN && !grid[first.row][first.col + 1].isVisited && !grid[first.row][first.col + 1].isObstacle) {
+                if (first.row === endNode.row && first.col + 1 === endNode.col) {
+                    alert(`Solved, explored ${cnt}/${ROWS*COLS} Nodes`)
+                    break; // we found the end
+                }
+                queue.push({ row: first.row, col: first.col + 1 });
+                visitedLog[first.row][first.col+1].isVisited = true
+                cnt++
+            }
+
+// left
+            if (MAXCOLS >= first.col - 1 && first.col - 1 >= MIN && !grid[first.row][first.col - 1].isVisited && !grid[first.row][first.col - 1].isObstacle) {
+                if (first.row === endNode.row && first.col - 1 === endNode.col) {
+                    alert(`Solved, explored ${cnt}/${ROWS*COLS} Nodes`)
+                    break; // we found the end
+                }
+                queue.push({ row: first.row, col: first.col - 1 });
+                visitedLog[first.row][first.col-1].isVisited = true
+                cnt++
+            }
+
+            // rerender
+            setGrid(visitedLog)
+            await delay(5);
+
+
+
+
+
+        }
+        if(queue.length === 0){
+            alert(`No solution found explored ${cnt}/${ROWS*COLS} Nodes`)
+        }
     }
 
     return (
