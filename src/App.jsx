@@ -64,12 +64,13 @@ function App() {
         <input id="BFS" type="radio" name="searchType"/>
         </label>
         <div className="choices">
+            <button onClick={handleMaze}>Maze</button>
         <button className={`${startChoice ? "startStyling" : ""} `} onClick={handleStartChoice}>Set Start</button>
         <button className={`${endChoice ? "endStyling" : ""}`} onClick={handleEndChoice}>Set End</button>
         <button className={`${setObs ? "obsStyling" : ""}`} onClick={handleEditObs}>Set Obstacles</button>
         <button className={ `${setRun ? "runStyling": ""}`} onClick={handleRun}>Run</button>
         <button onClick={handleReset}>Reset</button>
-        <button onClick={handleMaze}>Maze</button>
+
 
         </div>
 
@@ -77,17 +78,9 @@ function App() {
 
 
         <Grid setStartChoice={startChoice} setEndChoice={endChoice} setObs={setObs} setRun={setRun} setSearchType={searchType} resetGrid={resetGrid} maze={maze}/> {/*self contained component */}
-        <br/>
-        <div><b>Node data</b> <ul className="node-data">
 
-            <li>X: <span>Null</span></li>
-            <li>Y: <span>Null</span></li>
-            <li>Start: <span>Null</span></li>
-            <li>End: <span>Null</span></li>
-            <li>Obstacle: <span>Null</span></li>
-            <li>Visited: <span>Null</span></li>
-        </ul>
-        </div>
+
+
     </>
   )
 }
