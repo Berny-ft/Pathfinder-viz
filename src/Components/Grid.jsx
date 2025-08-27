@@ -6,8 +6,8 @@ import './Grid.css' // importing the styling for the grid
 
 
 // dimensions of the grid
-const ROWS = 20;
-const COLS = 20;
+const ROWS = 30;
+const COLS = 30;
 
 // helper function to create the initial grid data structure
 // we need it to be based on the function since it occurs when the page is loaded
@@ -41,7 +41,7 @@ function initializeGrid() {
 
 
 
-const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// correct name is needed here
+const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid,maze})=> {// correct name is needed here
     // use state to store the grid and the edit function associated with it
     const[grid, setGrid] = useState([]) // the grid begins empty, but then we associate then initialize to it
     const [startNode, setStartNode] = useState({row:null,col:null});
@@ -52,6 +52,151 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// c
         setGrid(initializeGrid());
     },[]) // the empty array as dependency means that it only runs one since the array can never change
 
+    // this allows to reset the grid when using the button
+    useEffect(() => {
+        setGrid(initializeGrid());
+    }, [resetGrid]);
+
+
+    useEffect(() => {
+        // This is the GUARD CLAUSE. It checks two things:
+        // 1. Do we want to run the maze? (maze is true)
+        // 2. Is the grid ready? (grid.length > 0)
+        if (maze) {
+            mazeDFS();
+        }
+    }, [maze]); // Add `grid` as a dependency
+
+
+
+
+
+    function mazeDFS(){
+        // first we need a grid full of obstacles
+        const tempGrid = grid.map(r => r.slice().map(node => ({
+            ...node,
+            isStart: false,
+            isEnd: false,
+            isObstacle: true,
+            isVisited: false,
+            previousNode: null,
+        })));
+
+        // this is the starting point
+        let row = Math.floor(ROWS/2);
+        let col = Math.floor(COLS/2);
+
+
+
+        // bounds checking
+        const MIN = 0;
+        const MAXROWS = ROWS - 1;
+        const MAXCOLS = COLS - 1;
+        const boundsCheckUp = (row) => row - 1 >= MIN;
+        const boundsCheckDown = (row) => row + 1 <= MAXROWS;
+        const boundsCheckRight = (col) => col + 1 <= MAXCOLS;
+        const boundsCheckLeft = (col) => col - 1 >= MIN;
+
+        // Helper function to count explored neighbors of a cell
+        const countExploredNeighbors = (r, c) => {
+            let count = 0;
+            if (boundsCheckUp(r) && tempGrid[r - 1][c].isVisited) count++;
+            if (boundsCheckDown(r) && tempGrid[r + 1][c].isVisited) count++;
+            if (boundsCheckLeft(c) && tempGrid[r][c - 1].isVisited) count++;
+            if (boundsCheckRight(c) && tempGrid[r][c + 1].isVisited) count++;
+            return count;
+        };
+
+        // Mark starting position
+        tempGrid[row][col].isObstacle = false;
+        tempGrid[row][col].isVisited = true;
+
+        let options = [0, 1, 2, 3]; // up, right, down, left
+
+        while (true) {
+            // If no options available, backtrack
+            if (options.length === 0) {
+                if (tempGrid[row][col].previousNode === null) {
+                    // We've backtracked to the start, maze is complete
+                    break;
+                }
+
+                // Backtrack to previous node
+                const prevNode = tempGrid[row][col].previousNode;
+                row = prevNode.row;
+                col = prevNode.col;
+                options = [0, 1, 2, 3];
+                continue;
+            }
+
+            const randIdx = Math.floor(Math.random() * options.length);
+            const choice = options[randIdx];
+            let moved = false;
+
+            if (choice === 0) { // UP
+                if (boundsCheckUp(row) &&
+                    !tempGrid[row - 1][col].isVisited &&
+                    countExploredNeighbors(row - 1, col) === 1) { // Only current cell should be explored neighbor
+
+                    row--;
+                    tempGrid[row][col].isObstacle = false;
+                    tempGrid[row][col].isVisited = true;
+                    tempGrid[row][col].previousNode = tempGrid[row + 1][col];
+                    options = [0, 1, 2, 3];
+                    moved = true;
+                }
+            } else if (choice === 1) { // RIGHT
+                if (boundsCheckRight(col) &&
+                    !tempGrid[row][col + 1].isVisited &&
+                    countExploredNeighbors(row, col + 1) === 1) { // Only current cell should be explored neighbor
+
+                    col++;
+                    tempGrid[row][col].isObstacle = false;
+                    tempGrid[row][col].isVisited = true;
+                    tempGrid[row][col].previousNode = tempGrid[row][col - 1];
+                    options = [0, 1, 2, 3];
+                    moved = true;
+                }
+            } else if (choice === 2) { // DOWN
+                if (boundsCheckDown(row) &&
+                    !tempGrid[row + 1][col].isVisited &&
+                    countExploredNeighbors(row + 1, col) === 1) { // Only current cell should be explored neighbor
+
+                    row++;
+                    tempGrid[row][col].isObstacle = false;
+                    tempGrid[row][col].isVisited = true;
+                    tempGrid[row][col].previousNode = tempGrid[row - 1][col];
+                    options = [0, 1, 2, 3];
+                    moved = true;
+                }
+            } else if (choice === 3) { // LEFT
+                if (boundsCheckLeft(col) &&
+                    !tempGrid[row][col - 1].isVisited &&
+                    countExploredNeighbors(row, col - 1) === 1) { // Only current cell should be explored neighbor
+
+                    col--;
+                    tempGrid[row][col].isObstacle = false;
+                    tempGrid[row][col].isVisited = true;
+                    tempGrid[row][col].previousNode = tempGrid[row][col + 1];
+                    options = [0, 1, 2, 3];
+                    moved = true;
+                }
+            }
+
+            // If we couldn't move in this direction, remove it from options
+            if (!moved) {
+                options.splice(randIdx, 1);
+            }
+        }
+
+        // Reset visited flags for the final grid
+        const finalGrid = tempGrid.map(r => r.slice().map(node => ({
+            ...node,
+            isVisited: false
+        })));
+
+        setGrid(finalGrid);
+    }
 
     // if the node is clicked it tells it to the grid through on link
     function HandleNodeClick(row,col){
@@ -164,6 +309,8 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// c
             const boundsCheckRight = MAXROWS >=row && row>= MIN  && MAXCOLS >=col+1 && col+1>= MIN
             const boundsCheckLeft = MAXROWS >=row && row>= MIN  && MAXCOLS >=col-1 && col-1>= MIN
             if (endNode.row === row && endNode.col === col){ // stopping condition if the end is reached
+                visitedLog[row][col].isVisited = true; // Add this line
+                setGrid(visitedLog);
                 alert(`Solved, explored ${cnt}/${ROWS*COLS} Nodes`)
                 break;
             } else if ( boundsCheckUp && !grid[row-1][col].isObstacle && !grid[row-1][col].isVisited){ // bounds checking when moving upwards
@@ -200,8 +347,8 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// c
                 alert(`No solution found explored ${cnt}/${ROWS*COLS} Nodes`)
                 break;
             } else {// backtrack
-                row  = grid[row][col].previousNode.row
-                col  = grid[row][col].previousNode.col
+                row  = visitedLog[row][col].previousNode.row
+                col  = visitedLog[row][col].previousNode.col
 
             }
 
@@ -211,7 +358,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType})=> {// c
 
             // rerender
             setGrid(visitedLog)
-            await delay(5);
+            await delay(20);
 
 
 

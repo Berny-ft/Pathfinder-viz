@@ -9,15 +9,26 @@
 
 .node-visited{
     background-color:yellow;
+    outline:yellow;
+    /*border-radius: 0;*/
 }
 
 .node-start{
     background-color:deepskyblue;
+
 }
 .node-end{
     background-color:indianred;
+
 }
 .node-obs{
     background-color:black;
+
 }
+.node-shortest-path{
+    background-color:greenyellow;
+
+}
+
+
 

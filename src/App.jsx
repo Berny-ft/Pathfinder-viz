@@ -7,37 +7,35 @@ function App() {
     const [setObs, editSetObs] = useState(false)
     const [setRun, editSetRun] = useState(false)
     const [searchType, editSearchType] = useState("DFS")
+    const [resetGrid,editResetGrid] = useState(true)
+    const [maze, editMaze] = useState(false)
 
     function handleStartChoice(){
         editSetObs(false)
         editEndChoice(false)
         editSetRun(false)
-        const start = startChoice === false
-        editStartChoice(start)
+        editStartChoice(!startChoice)
     }
 
     function handleEndChoice() {
         editSetObs(false)
         editStartChoice(false)
         editSetRun(false)
-        const end = endChoice === false
-        editEndChoice(end)
+        editEndChoice(!endChoice)
     }
 
     function handleEditObs() {
         editEndChoice(false)
         editStartChoice(false)
         editSetRun(false)
-        const obs = setObs === false
-        editSetObs(obs)
+        editSetObs(!setObs)
     }
 
     function handleRun(){
         editEndChoice(false)
         editStartChoice(false)
         editSetObs(false)
-        const tempRun = setRun === false;
-        editSetRun(tempRun)
+        editSetRun(!setRun)
     }
 
     function handleDfs(){
@@ -45,6 +43,13 @@ function App() {
     }
     function handleBfs(){
         editSearchType('BFS')
+    }
+    function handleReset(){
+        editResetGrid(!resetGrid)
+    }
+
+    function handleMaze(){
+        editMaze(!maze)
     }
 
     return (
@@ -62,15 +67,16 @@ function App() {
         <button className={`${startChoice ? "startStyling" : ""} `} onClick={handleStartChoice}>Set Start</button>
         <button className={`${endChoice ? "endStyling" : ""}`} onClick={handleEndChoice}>Set End</button>
         <button className={`${setObs ? "obsStyling" : ""}`} onClick={handleEditObs}>Set Obstacles</button>
-        <button className={ `${setRun ? "runStyling": ""}`} onClick={handleRun}>RUN</button>
-        <button onClick={()=> location.reload()}>RESET</button>
+        <button className={ `${setRun ? "runStyling": ""}`} onClick={handleRun}>Run</button>
+        <button onClick={handleReset}>Reset</button>
+        <button onClick={handleMaze}>Maze</button>
 
         </div>
 
         </div>
 
 
-        <Grid setStartChoice={startChoice} setEndChoice={endChoice} setObs={setObs} setRun={setRun} setSearchType={searchType}/> {/*self contained component */}
+        <Grid setStartChoice={startChoice} setEndChoice={endChoice} setObs={setObs} setRun={setRun} setSearchType={searchType} resetGrid={resetGrid} maze={maze}/> {/*self contained component */}
         <br/>
         <div><b>Node data</b> <ul className="node-data">
 
