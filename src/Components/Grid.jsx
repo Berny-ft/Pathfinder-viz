@@ -6,8 +6,8 @@ import './Grid.css' // importing the styling for the grid
 
 
 // dimensions of the grid
-const ROWS = 30;
-const COLS = 30;
+const ROWS = 16;
+const COLS = 16;
 
 // helper function to create the initial grid data structure
 // we need it to be based on the function since it occurs when the page is loaded
@@ -343,13 +343,15 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
                 col = col - 1
                 visitedLog[row][col].isVisited = true
                 visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
-            }else if(grid[row][col].previousNode.row === startNode.row && grid[row][col].previousNode.col === startNode.col){
-                alert(`No solution found explored ${cnt}/${ROWS*COLS} Nodes`)
+            } else if (!visitedLog[row][col].previousNode) {
+                // no previous node means we’ve backtracked all the way
+                alert(`No solution found, explored ${cnt}/${ROWS*COLS} Nodes`);
                 break;
-            } else {// backtrack
-                row  = visitedLog[row][col].previousNode.row
-                col  = visitedLog[row][col].previousNode.col
-
+            } else {
+                // backtrack using the node we actually recorded
+                const prev = visitedLog[row][col].previousNode;
+                row = prev.row;
+                col = prev.col;
             }
 
 
