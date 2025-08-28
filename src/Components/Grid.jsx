@@ -6,8 +6,8 @@ import './Grid.css' // importing the styling for the grid
 
 
 // dimensions of the grid
-const ROWS = 16;
-const COLS = 16;
+const ROWS = 20;
+const COLS = 20;
 
 // helper function to create the initial grid data structure
 // we need it to be based on the function since it occurs when the page is loaded
@@ -435,7 +435,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
 
             // rerender
             setGrid(visitedLog)
-            await delay(5);
+            await delay(20);
 
 
 
