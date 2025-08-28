@@ -1,12 +1,53 @@
-# React + Vite
+# Pathfinding Visualizer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a web-based visualization tool for pathfinding algorithms. It allows users to visualize how algorithms like Depth-First Search (DFS) and Breadth-First Search (BFS) find the shortest path between two points on a grid, avoiding obstacles.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+*   **Interactive Grid:** Create and modify the grid of nodes.
+*   **Algorithm Selection:** Choose between different pathfinding algorithms (DFS and BFS).
+*   **Set Start and End Points:** Define the starting and ending nodes for the pathfinding.
+*   **Obstacle Creation:** Add obstacles to the grid to challenge the algorithms.
+*   **Maze Generation:** Generate a random maze.
+*   **Real-time Visualization:** Watch the algorithms explore the grid in real-time.
+*   **Reset Functionality:** Easily reset the grid to its initial state.
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+*   Node.js and npm installed on your machine.
+
+### Installation
+
+1.  Clone the repo
+    ```sh
+    git clone https://github.com/your_username_/pathfinder-viz.git
+    ```
+2.  Install NPM packages
+    ```sh
+    npm install
+    ```
+3.  Run the development server
+    ```sh
+    npm run dev
+    ```
+
+## Usage
+
+1.  **Select an Algorithm:** Choose either DFS or BFS from the menu.
+2.  **Set Start and End Points:** Click on the "Set Start" and "Set End" buttons and then click on the grid to place the start and end nodes.
+3.  **Add Obstacles:** Click on the "Set Obstacles" button and click on the grid to add obstacles.
+4.  **Generate a Maze:** Click on the "Maze" button to generate a random maze.
+5.  **Run the Visualization:** Click the "Run" button to see the algorithm in action.
+6.  **Reset:** Click the "Reset" button to clear the grid.
+
+## Technologies Used
+
+*   [React](https://reactjs.org/)
+*   [Vite](https://vitejs.dev/)
+*   [JavaScript](https://www.javascript.com/)
+*   [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
+*   [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
