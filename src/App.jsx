@@ -53,35 +53,47 @@ function App() {
     }
 
     return (
-    <>
+    <div className="app-container">
       <h1>Pathfinding visualizer</h1>
 
         <div className='menu'>
-        <label onClick={handleDfs}> DFS
-        <input  id="DFS" type="radio" name="searchType"/>
-        </label>
-        <label onClick={handleBfs}> BFS
-        <input id="BFS" type="radio" name="searchType"/>
-        </label>
-        <div className="choices">
-            <button onClick={handleMaze}>Maze</button>
-        <button className={`${startChoice ? "startStyling" : ""} `} onClick={handleStartChoice}>Set Start</button>
-        <button className={`${endChoice ? "endStyling" : ""}`} onClick={handleEndChoice}>Set End</button>
-        <button className={`${setObs ? "obsStyling" : ""}`} onClick={handleEditObs}>Set Obstacles</button>
-        <button className={ `${setRun ? "runStyling": ""}`} onClick={handleRun}>Run</button>
-        <button onClick={handleReset}>Reset</button>
+            <fieldset>
+                <legend>Algorithm</legend>
+                <label onClick={handleDfs}> DFS
+                    <input id="DFS" type="radio" name="searchType" defaultChecked/>
+                </label>
+                <label onClick={handleBfs}> BFS
+                    <input id="BFS" type="radio" name="searchType"/>
+                </label>
+            </fieldset>
 
+            <fieldset>
+                <legend>Edit Grid</legend>
+                <div className="choices">
+                    <button className={`${startChoice ? "startStyling" : ""} `} onClick={handleStartChoice}>Set Start</button>
+                    <button className={`${endChoice ? "endStyling" : ""}`} onClick={handleEndChoice}>Set End</button>
+                    <button className={`${setObs ? "obsStyling" : ""}`} onClick={handleEditObs}>Set Obstacles</button>
+                </div>
+            </fieldset>
 
+            <fieldset>
+                <legend>Actions</legend>
+                <div className="choices">
+                    <button onClick={handleMaze}>Generate Maze</button>
+                    <button className={ `${setRun ? "runStyling": ""}`} onClick={handleRun}>Run</button>
+                    <button onClick={handleReset}>Reset</button>
+                </div>
+            </fieldset>
         </div>
 
+
+        <div className="grid-container">
+            <Grid setStartChoice={startChoice} setEndChoice={endChoice} setObs={setObs} setRun={setRun} setSearchType={searchType} resetGrid={resetGrid} maze={maze}/> {/*self contained component */}
         </div>
 
 
-        <Grid setStartChoice={startChoice} setEndChoice={endChoice} setObs={setObs} setRun={setRun} setSearchType={searchType} resetGrid={resetGrid} maze={maze}/> {/*self contained component */}
 
-
-
-    </>
+    </div>
   )
 }
 
