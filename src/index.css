@@ -1,60 +1,121 @@
-/* creating the default theme for the app*/
 body {
-  font-family : "IBM Plex Mono",monospace; /*monospace means every character takes the same amount of space*/
-  background-color: #ffffff; /*full white*/
+  font-family: "IBM Plex Mono", monospace;
+  background-color: #1a1a1a; /* Dark background */
+  color: #f0f0f0; /* Light text */
+  margin: 0;
+  padding: 20px;
 }
 
-.choices { /*copied the styling*/
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.choices {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 10px;
-
+  gap: 12px;
 }
 
 .choices button {
-  background-color: #f0f0f0; /* Light grey background */
-  color: #333; /* Dark grey text */
-  padding: 10px 20px; /* Spacing inside the button */
-  border: none; /* Remove default border */
-  cursor: pointer; /* Indicate it's clickable */
-  font-family: sans-serif; /* Simple font */
-  font-size: 16px; /* Readable text size */
+  font-family: inherit;
+  background-color: #333; /* Darker button background */
+  color: #f0f0f0; /* Light text */
+  padding: 12px 24px;
+  border: 1px solid #555;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
 
-  /* Rounded corners */
-  border-radius: 5px;
+.choices button:hover {
+  background-color: #444; /* Lighter on hover */
+}
+
+.choices button:active {
+  transform: scale(0.98);
 }
 
 .menu {
   display: flex;
-  flex-direction:row;
   flex-wrap: wrap;
-  align-items: center;
-  gap:20px;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.grid-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 20px;
+  display: flex; /* Add this */
+  justify-content: center; /* Add this */
+}
+
+fieldset {
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+legend {
+    padding: 0 10px;
+    color: #f0f0f0;
 }
 
 .choices .startStyling {
-  background-color: deepskyblue;
-
+  background-color: #007bff; /* Blue */
+  border-color: #0056b3;
 }
+
 .choices .endStyling {
-  background-color: indianred;
-
+  background-color: #dc3545; /* Red */
+  border-color: #b21f2d;
 }
+
 .choices .obsStyling {
-  background-color: black;
+  background-color: #6c757d; /* Gray */
+  border-color: #5a6268;
   color: white;
-
-
 }
+
 .choices .runStyling {
-  background-color: lawngreen;
-
+  background-color: #28a745; /* Green */
+  border-color: #1e7e34;
 }
 
-.node-data{
+.node-data {
   padding: 0;
-
-
-  list-style-type:disc ;
+  list-style-type: none;
 }
+
+.node-data li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.node-data .color-box {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  border-radius: 4px;
+}
+
+.node-data .start { background-color: #007bff; }
+.node-data .end { background-color: #dc3545; }
+.node-data .obstacle { background-color: #6c757d; }
+.node-data .visited { background-color: #ffc107; }
+.node-data .shortest-path { background-color: #28a745; }
+.node-data .unexplored { background-color: #f8f9fa; }
+.node-data .current { background-color: #6f42c1; }

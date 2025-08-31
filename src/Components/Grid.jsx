@@ -8,6 +8,7 @@ import './Grid.css' // importing the styling for the grid
 // dimensions of the grid
 const ROWS = 20;
 const COLS = 20;
+const SPEED = 50;
 
 // helper function to create the initial grid data structure
 // we need it to be based on the function since it occurs when the page is loaded
@@ -46,6 +47,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
     const[grid, setGrid] = useState([]) // the grid begins empty, but then we associate then initialize to it
     const [startNode, setStartNode] = useState({row:null,col:null});
     const [endNode, setEndNode] = useState({row:null,col:null});
+    const [obstacleCount, setObstacleCount] = useState(0);
 
     // use effect used to run code only when we mount the component so we use it to initialize the grid
     useEffect(()=>{
@@ -55,6 +57,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
     // this allows to reset the grid when using the button
     useEffect(() => {
         setGrid(initializeGrid());
+        setObstacleCount(0);
     }, [resetGrid]);
 
 
@@ -237,10 +240,12 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
 
             if (newGrid[row][col].isObstacle){
                 newGrid[row][col].isObstacle = false;
+                setObstacleCount(obstacleCount - 1); // Decrement
             } else {
 
                 const clickedNode = newGrid[row][col]
                 clickedNode.isObstacle = true;
+                setObstacleCount(obstacleCount + 1); // Increment
 
             }
             setGrid(newGrid)
@@ -287,15 +292,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
 
 
 
-           // if up is not out of bounds nor obstacle set current node to previous
-            // go up and set it to current push current node in the stack  if current is the end. break
-            // you could pop c
-            // else the same for right
-            // else the same of down
-            // else the same for left
-            // else pop current from the stack  use it
-            // each node has a previous
-            // after each rul timeout of 20ms do nothing
+
 
             // keeping track of positioning
             const prevRow = row;
@@ -311,7 +308,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
             if (endNode.row === row && endNode.col === col){ // stopping condition if the end is reached
                 visitedLog[row][col].isVisited = true; // Add this line
                 setGrid(visitedLog);
-                alert(`Solved, explored ${cnt}/${ROWS*COLS} Nodes`)
+                alert(`Solved, explored ${cnt}/${ROWS*COLS - obstacleCount - 2} Nodes`)
                 break;
             } else if ( boundsCheckUp && !grid[row-1][col].isObstacle && !grid[row-1][col].isVisited){ // bounds checking when moving upwards
                 cnt++;
@@ -345,7 +342,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
                 visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
             } else if (!visitedLog[row][col].previousNode) {
                 // no previous node means we’ve backtracked all the way
-                alert(`No solution found, explored ${cnt}/${ROWS*COLS} Nodes`);
+                alert(`No solution found, explored ${cnt}/${ROWS*COLS - obstacleCount - 2} Nodes`);
                 break;
             } else {
                 // backtrack using the node we actually recorded
@@ -360,7 +357,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
 
             // rerender
             setGrid(visitedLog)
-            await delay(20);
+            await delay(SPEED);
 
 
 
@@ -392,7 +389,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
             // up
             if (MAXROWS >= first.row - 1 && first.row - 1 >= MIN && !grid[first.row - 1][first.col].isVisited && !grid[first.row - 1][first.col].isObstacle) {
                 if (first.row - 1 === endNode.row && first.col === endNode.col) {
-                    alert(`Solved, explored ${cnt}/${ROWS*COLS} Nodes`)
+                    alert(`Solved, explored ${cnt}/${ROWS*COLS - obstacleCount - 2} Nodes`)
                     break; // we found the end
                 }
                 queue.push({ row: first.row - 1, col: first.col });
@@ -403,7 +400,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
 // down
             if (MAXROWS >= first.row + 1 && first.row + 1 >= MIN && !grid[first.row + 1][first.col].isVisited && !grid[first.row + 1][first.col].isObstacle) {
                 if (first.row + 1 === endNode.row && first.col === endNode.col) {
-                    alert(`Solved, explored ${cnt}/${ROWS*COLS} Nodes`)
+                    alert(`Solved, explored ${cnt}/${ROWS*COLS - obstacleCount - 2} Nodes`)
                     break; // we found the end
                 }
                 queue.push({ row: first.row + 1, col: first.col });
@@ -414,7 +411,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
 // right
             if (MAXCOLS >= first.col + 1 && first.col + 1 >= MIN && !grid[first.row][first.col + 1].isVisited && !grid[first.row][first.col + 1].isObstacle) {
                 if (first.row === endNode.row && first.col + 1 === endNode.col) {
-                    alert(`Solved, explored ${cnt}/${ROWS*COLS} Nodes`)
+                    alert(`Solved, explored ${cnt}/${ROWS*COLS - obstacleCount - 2} Nodes`)
                     break; // we found the end
                 }
                 queue.push({ row: first.row, col: first.col + 1 });
@@ -425,7 +422,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
 // left
             if (MAXCOLS >= first.col - 1 && first.col - 1 >= MIN && !grid[first.row][first.col - 1].isVisited && !grid[first.row][first.col - 1].isObstacle) {
                 if (first.row === endNode.row && first.col - 1 === endNode.col) {
-                    alert(`Solved, explored ${cnt}/${ROWS*COLS} Nodes`)
+                    alert(`Solved, explored ${cnt}/${ROWS*COLS - obstacleCount - 2} Nodes`)
                     break; // we found the end
                 }
                 queue.push({ row: first.row, col: first.col - 1 });
@@ -435,7 +432,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
 
             // rerender
             setGrid(visitedLog)
-            await delay(20);
+            await delay(SPEED);
 
 
 
@@ -443,7 +440,7 @@ const Grid = ({setStartChoice,setEndChoice,setObs,setRun,setSearchType,resetGrid
 
         }
         if(queue.length === 0){
-            alert(`No solution found explored ${cnt}/${ROWS*COLS} Nodes`)
+            alert(`No solution found explored ${cnt}/${ROWS*COLS - obstacleCount - 2} Nodes`)
         }
     }
 
