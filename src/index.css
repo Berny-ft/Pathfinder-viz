@@ -38,6 +38,15 @@ body {
   background-color: #444; /* Lighter on hover */
 }
 
+.choices button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.choices button:disabled:hover {
+  background-color: #333;
+}
+
 .choices button:active {
   transform: scale(0.98);
 }

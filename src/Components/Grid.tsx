@@ -15,6 +15,13 @@ interface Position {
     col: number;
 }
 
+export interface RunResult {
+    grid: NodeData[][];
+    startNode: Position;
+    endNode: Position;
+    isBidirectional: boolean;
+}
+
 interface GridProps {
     setStartChoice: boolean;
     setEndChoice: boolean;
@@ -25,6 +32,7 @@ interface GridProps {
     resetGrid: boolean;
     maze: boolean;
     speed: number;
+    onRunComplete: (result: RunResult) => void;
 }
 
 function initializeGrid(): NodeData[][] {
@@ -42,6 +50,7 @@ function initializeGrid(): NodeData[][] {
                 isCurrent: false,
                 isPath: false,
                 previousNode: null,
+                visitOrder: null,
                 terrain: TerrainType.Road,
                 cost: TERRAIN_COSTS[TerrainType.Road],
             });
@@ -52,7 +61,7 @@ function initializeGrid(): NodeData[][] {
     return grid;
 }
 
-const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainType.Wall, setRun, setSearchType, resetGrid, maze, speed }: GridProps) => {
+const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainType.Wall, setRun, setSearchType, resetGrid, maze, speed, onRunComplete }: GridProps) => {
     const [grid, setGrid] = useState<NodeData[][]>([]);
     const [startNode, setStartNode] = useState<Position>({ row: null as unknown as number, col: null as unknown as number });
     const [endNode, setEndNode] = useState<Position>({ row: null as unknown as number, col: null as unknown as number });
@@ -88,6 +97,7 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
             isCurrent: false,
             isPath: false,
             previousNode: null,
+            visitOrder: null,
             terrain: TerrainType.Road,
             cost: TERRAIN_COSTS[TerrainType.Road],
         })));
@@ -319,6 +329,7 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
             isCurrent: false,
             isPath: false,
             previousNode: null,
+            visitOrder: node.isStart ? 1 : null,
         })));
     }
 
@@ -348,17 +359,22 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
 
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-    async function revealPath(endNodeData: NodeData, runId: number) {
+    function finishRun(finalGrid: NodeData[][], runId: number, isBidirectional = false) {
+        if (runIdRef.current !== runId) return;
+        onRunComplete({ grid: finalGrid, startNode, endNode, isBidirectional });
+    }
+
+    async function revealPath(endNodeData: NodeData, runId: number, sourceGrid: NodeData[][]): Promise<NodeData[][]> {
         const path = reconstructPath(endNodeData);
+        let workingGrid = sourceGrid;
         for (const { row, col } of path) {
-            if (runIdRef.current !== runId) return;
-            setGrid(prev => {
-                const next = prev.map(r => r.slice());
-                next[row][col] = { ...next[row][col], isPath: true, isCurrent: false };
-                return next;
-            });
+            if (runIdRef.current !== runId) return workingGrid;
+            workingGrid = workingGrid.map(r => r.slice());
+            workingGrid[row][col] = { ...workingGrid[row][col], isPath: true, isCurrent: false };
+            setGrid(workingGrid);
             await delay(speed);
         }
+        return workingGrid;
     }
 
     async function DFS(initialGrid: NodeData[][], runId: number) {
@@ -387,8 +403,9 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
                 visitedLog[row][col].isVisited = true;
                 visitedLog[row][col].isCurrent = false;
                 setGrid(visitedLog);
-                setStatus(`Solved — explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
-                await revealPath(visitedLog[row][col], runId);
+                setStatus(`Solved: explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
+                const finalGrid = await revealPath(visitedLog[row][col], runId, visitedLog);
+                finishRun(finalGrid, runId);
                 break;
             } else if (boundsCheckUp && !visitedLog[row - 1][col].isObstacle && !visitedLog[row - 1][col].isVisited) {
                 cnt++;
@@ -396,26 +413,31 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
                 visitedLog[row][col].isVisited = true
                 visitedLog[row][col].isCurrent = true
                 visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
+                visitedLog[row][col].visitOrder = cnt
             } else if (boundsCheckRight && !visitedLog[row][col + 1].isObstacle && !visitedLog[row][col + 1].isVisited) {
                 cnt++
                 col = col + 1
                 visitedLog[row][col].isVisited = true
                 visitedLog[row][col].isCurrent = true
                 visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
+                visitedLog[row][col].visitOrder = cnt
             } else if (boundsCheckDown && !visitedLog[row + 1][col].isObstacle && !visitedLog[row + 1][col].isVisited) {
                 cnt++
                 row = row + 1
                 visitedLog[row][col].isVisited = true
                 visitedLog[row][col].isCurrent = true
                 visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
+                visitedLog[row][col].visitOrder = cnt
             } else if (boundsCheckLeft && !visitedLog[row][col - 1].isObstacle && !visitedLog[row][col - 1].isVisited) {
                 cnt++
                 col = col - 1
                 visitedLog[row][col].isVisited = true
                 visitedLog[row][col].isCurrent = true
                 visitedLog[row][col].previousNode = visitedLog[prevRow][prevCol]
+                visitedLog[row][col].visitOrder = cnt
             } else if (!visitedLog[row][col].previousNode) {
-                setStatus(`No solution found — explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
+                setStatus(`No solution found: explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
+                finishRun(visitedLog, runId);
                 break;
             } else {
                 const prev = visitedLog[row][col].previousNode!;
@@ -463,10 +485,12 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
                     visitedLog[r][c].isVisited = true;
                     visitedLog[r][c].previousNode = visitedLog[first.row][first.col];
                     cnt++;
+                    visitedLog[r][c].visitOrder = cnt;
                     if (r === endNode.row && c === endNode.col) {
                         setGrid(visitedLog);
-                        setStatus(`Solved — explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
-                        await revealPath(visitedLog[r][c], runId);
+                        setStatus(`Solved: explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
+                        const finalGrid = await revealPath(visitedLog[r][c], runId, visitedLog);
+                        finishRun(finalGrid, runId);
                         return;
                     }
                     queue.push({ row: r, col: c });
@@ -479,7 +503,8 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
         }
 
         if (runIdRef.current !== runId) return;
-        setStatus(`No solution found — explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
+        setStatus(`No solution found: explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
+        finishRun(workingGrid, runId);
     }
 
     function neighborsOf(row: number, col: number): Position[] {
@@ -494,6 +519,7 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
     // shared weighted search (Dijkstra when heuristic is absent, A* / Greedy when present)
     async function weightedSearch(initialGrid: NodeData[][], useGScore: boolean, runId: number, heuristic?: (r: number, c: number) => number) {
         let cnt = 1;
+        let settledCount = 1;
         const dist = new Map<string, number>();
         const key = (r: number, c: number) => `${r},${c}`;
         const settled = new Set<string>();
@@ -520,12 +546,17 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
             }
             visitedLog[current.row][current.col].isVisited = true;
             visitedLog[current.row][current.col].isCurrent = true;
+            if (!(current.row === startNode.row && current.col === startNode.col)) {
+                settledCount++;
+                visitedLog[current.row][current.col].visitOrder = settledCount;
+            }
             prevCurrent = { row: current.row, col: current.col };
 
             if (current.row === endNode.row && current.col === endNode.col) {
                 setGrid(visitedLog);
-                setStatus(`Solved — explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
-                await revealPath(visitedLog[current.row][current.col], runId);
+                setStatus(`Solved: explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
+                const finalGrid = await revealPath(visitedLog[current.row][current.col], runId, visitedLog);
+                finishRun(finalGrid, runId);
                 return;
             }
 
@@ -554,7 +585,8 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
         }
 
         if (runIdRef.current !== runId) return;
-        setStatus(`No solution found — explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
+        setStatus(`No solution found: explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
+        finishRun(workingGrid, runId);
     }
 
     async function Dijkstra(initialGrid: NodeData[][], runId: number) {
@@ -574,6 +606,8 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
     async function BidirectionalBFS(initialGrid: NodeData[][], runId: number) {
         const MIN = 0, MAXROWS = ROWS - 1, MAXCOLS = COLS - 1;
         let cnt = 2;
+        let startOrder = 1;
+        let endOrder = 1;
 
         let workingGrid = initialGrid.map(r => r.slice());
         // separate visited/previousNode bookkeeping for each frontier, since both share the same isVisited flag on nodes
@@ -583,10 +617,13 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
 
         const startQueue: Position[] = [{ row: startNode.row, col: startNode.col }];
         const endQueue: Position[] = [{ row: endNode.row, col: endNode.col }];
+        workingGrid[endNode.row][endNode.col].isVisited = true;
+        workingGrid[startNode.row][startNode.col].visitOrder = startOrder;
+        workingGrid[endNode.row][endNode.col].visitOrder = endOrder;
         startVisited.set(key(startNode.row, startNode.col), workingGrid[startNode.row][startNode.col]);
         endVisited.set(key(endNode.row, endNode.col), workingGrid[endNode.row][endNode.col]);
 
-        function expand(queue: Position[], visited: Map<string, NodeData>, otherVisited: Map<string, NodeData>, log: NodeData[][]): Position | null {
+        function expand(queue: Position[], visited: Map<string, NodeData>, otherVisited: Map<string, NodeData>, log: NodeData[][], isStartFrontier: boolean): Position | null {
             const nextQueue: Position[] = [];
             for (const row of log) {
                 for (const node of row) {
@@ -600,7 +637,13 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
                     const k = key(r, c);
                     if (visited.has(k)) continue;
 
-                    log[r][c] = { ...log[r][c], isVisited: true, previousNode: log[row][col] };
+                    if (isStartFrontier) {
+                        startOrder++;
+                        log[r][c] = { ...log[r][c], isVisited: true, previousNode: log[row][col], visitOrder: startOrder };
+                    } else {
+                        endOrder++;
+                        log[r][c] = { ...log[r][c], isVisited: true, previousNode: log[row][col], visitOrder: endOrder };
+                    }
                     visited.set(k, log[r][c]);
                     cnt++;
 
@@ -619,14 +662,14 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
             if (runIdRef.current !== runId) return;
             const visitedLog = workingGrid.map(r => r.slice());
 
-            const meetFromStart = expand(startQueue, startVisited, endVisited, visitedLog);
-            const meetingPoint = meetFromStart ?? expand(endQueue, endVisited, startVisited, visitedLog);
+            const meetFromStart = expand(startQueue, startVisited, endVisited, visitedLog, true);
+            const meetingPoint = meetFromStart ?? expand(endQueue, endVisited, startVisited, visitedLog, false);
 
             workingGrid = visitedLog;
             setGrid(visitedLog);
 
             if (meetingPoint) {
-                setStatus(`Solved — explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
+                setStatus(`Solved: explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
 
                 const fromStart = reconstructPath(startVisited.get(key(meetingPoint.row, meetingPoint.col))!);
                 let node: NodeData | null = endVisited.get(key(meetingPoint.row, meetingPoint.col))!.previousNode;
@@ -637,15 +680,15 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
                 }
                 const fullPath = [...fromStart, ...fromEnd];
 
+                let pathGrid = workingGrid;
                 for (const { row, col } of fullPath) {
                     if (runIdRef.current !== runId) return;
-                    setGrid(prev => {
-                        const next = prev.map(r => r.slice());
-                        next[row][col] = { ...next[row][col], isPath: true, isCurrent: false };
-                        return next;
-                    });
+                    pathGrid = pathGrid.map(r => r.slice());
+                    pathGrid[row][col] = { ...pathGrid[row][col], isPath: true, isCurrent: false };
+                    setGrid(pathGrid);
                     await delay(speed);
                 }
+                finishRun(pathGrid, runId, true);
                 return;
             }
 
@@ -653,7 +696,8 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
         }
 
         if (runIdRef.current !== runId) return;
-        setStatus(`No solution found — explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
+        setStatus(`No solution found: explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
+        finishRun(workingGrid, runId, true);
     }
 
     const originX = (ROWS - 1) * (TILE_WIDTH / 2);

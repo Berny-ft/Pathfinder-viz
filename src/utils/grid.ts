@@ -46,6 +46,7 @@ export function createInitialGrid(
             isCurrent: false,
             isPath: false,
             previousNode: null,
+            visitOrder: null,
         }
 
         currentRow.push(node);

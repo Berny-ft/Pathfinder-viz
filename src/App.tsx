@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import Grid from "./Components/Grid.tsx";
+import Grid, { RunResult } from "./Components/Grid.tsx";
+import GameTree from "./Components/GameTree.tsx";
 import { TerrainType } from './constants/terrain.ts';
 
 function App() {
@@ -12,6 +13,8 @@ function App() {
     const [resetGrid, editResetGrid] = useState(true);
     const [maze, editMaze] = useState(false);
     const [speed, setSpeed] = useState(35);
+    const [runResult, setRunResult] = useState<RunResult | null>(null);
+    const [isTreeOpen, setIsTreeOpen] = useState(false);
 
     function handleStartChoice() {
         editSetObs(false);
@@ -59,6 +62,8 @@ function App() {
     }
     function handleReset() {
         editResetGrid(!resetGrid);
+        setRunResult(null);
+        setIsTreeOpen(false);
     }
 
     function handleMaze() {
@@ -153,6 +158,7 @@ function App() {
                             <button onClick={handleMaze}>Generate Maze</button>
                             <button onClick={handleRun}>Run</button>
                             <button onClick={handleReset}>Reset</button>
+                            <button disabled={!runResult} onClick={() => setIsTreeOpen(true)}>Search Tree</button>
                         </div>
                     </fieldset>
                 </div>
@@ -169,8 +175,11 @@ function App() {
                     resetGrid={resetGrid}
                     maze={maze}
                     speed={speed}
+                    onRunComplete={setRunResult}
                 />
             </div>
+
+            {isTreeOpen && <GameTree result={runResult} onClose={() => setIsTreeOpen(false)} />}
         </div>
     );
 }

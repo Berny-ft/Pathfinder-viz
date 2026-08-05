@@ -29,6 +29,14 @@ export const TERRAIN_TILES: Record<TerrainType, string> = {
     [TerrainType.Wall]: wallTile,
 };
 
+export const TERRAIN_COLORS: Record<TerrainType, string> = {
+    [TerrainType.Road]: '#8d99a6',
+    [TerrainType.Grass]: '#2e7d32',
+    [TerrainType.Water]: '#0288d1',
+    [TerrainType.Mountain]: '#795548',
+    [TerrainType.Wall]: '#37474f',
+};
+
 
 export interface NodeData {
   row: number;
@@ -42,4 +50,5 @@ export interface NodeData {
   isCurrent: boolean;
   isPath: boolean;
   previousNode: NodeData | null;
+  visitOrder: number | null;
 }
