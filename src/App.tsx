@@ -11,6 +11,7 @@ function App() {
     const [searchType, editSearchType] = useState("DFS");
     const [resetGrid, editResetGrid] = useState(true);
     const [maze, editMaze] = useState(false);
+    const [speed, setSpeed] = useState(35);
 
     function handleStartChoice() {
         editSetObs(false);
@@ -99,6 +100,20 @@ function App() {
                             <button className={endChoice ? "endStyling" : ""} onClick={handleEndChoice}>Set End</button>
                         </div>
                     </fieldset>
+
+                    <fieldset className="speed-fieldset">
+                        <legend>Speed</legend>
+                        <div className="speed-control">
+                            <input
+                                type="range"
+                                min={35}
+                                max={150}
+                                step={5}
+                                value={185 - speed}
+                                onChange={e => setSpeed(185 - Number(e.target.value))}
+                            />
+                        </div>
+                    </fieldset>
                 </div>
 
                 <div className="menu-row">
@@ -153,6 +168,7 @@ function App() {
                     setSearchType={searchType}
                     resetGrid={resetGrid}
                     maze={maze}
+                    speed={speed}
                 />
             </div>
         </div>

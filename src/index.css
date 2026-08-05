@@ -141,3 +141,21 @@ legend {
   text-align: center;
   margin: 10px 0 0;
 }
+
+.speed-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.speed-control input[type="range"] {
+  width: 90px;
+  accent-color: #007bff;
+  cursor: pointer;
+}
+
+.speed-control .speed-value {
+  font-size: 14px;
+  min-width: 62px;
+  text-align: right;
+}

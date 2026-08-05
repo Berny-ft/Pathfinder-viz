@@ -5,6 +5,21 @@ export interface GridPosition {
   col: number;
 }
 
+export const TILE_WIDTH = 48;
+export const TILE_HEIGHT = 24;
+
+export function tileTopLeft(row: number, col: number, originX: number) {
+  return {
+    left: originX + (col - row) * (TILE_WIDTH / 2),
+    top: (col + row) * (TILE_HEIGHT / 2),
+  };
+}
+
+export function tileCenter(row: number, col: number, originX: number) {
+  const { left, top } = tileTopLeft(row, col, originX);
+  return { x: left + TILE_WIDTH / 2, y: top + TILE_WIDTH / 2 };
+}
+
 export function createInitialGrid(
   rows: number,
   cols: number,

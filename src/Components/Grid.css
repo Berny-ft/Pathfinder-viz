@@ -2,3 +2,25 @@
     position: relative;
     margin: 20px auto 0;
 }
+
+.grid-trace {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    z-index: 2;
+    overflow: visible;
+}
+
+.trace-explored {
+    stroke: rgba(255, 176, 32, 0.85);
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+.trace-path {
+    stroke: #2ecc59;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 3px rgba(46, 204, 89, 0.8));
+}
