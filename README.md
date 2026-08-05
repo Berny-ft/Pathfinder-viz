@@ -48,6 +48,10 @@ These instructions will get you a copy of the project up and running on your loc
 
 *   [React](https://reactjs.org/)
 *   [Vite](https://vitejs.dev/)
-*   [JavaScript](https://www.javascript.com/)
+*   [TypeScript](https://www.typescriptlang.org/)
 *   [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)
 *   [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
+
+## Credits
+
+*   Terrain tiles: [Pixel Isometric Tiles](https://scrabling.itch.io/pixel-isometric-tiles) by [Scrabling](https://scrabling.itch.io/).

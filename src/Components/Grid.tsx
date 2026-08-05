@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import Node from "./Node.tsx";
+import Node, { TILE_WIDTH, TILE_HEIGHT } from "./Node.tsx";
 
 import './Grid.css'
 
@@ -645,32 +645,37 @@ const Grid = ({ setStartChoice, setEndChoice, setObs, activeTerrain = TerrainTyp
         setStatus(`No solution found — explored ${cnt}/${ROWS * COLS - obstacleCount - 2} nodes`);
     }
 
+    const originX = (ROWS - 1) * (TILE_WIDTH / 2);
+    const gridWidth = originX + COLS * (TILE_WIDTH / 2);
+    const gridHeight = (ROWS + COLS) * (TILE_HEIGHT / 2) + TILE_WIDTH / 2;
+
+    // iso depth order: cells with a higher (row + col) sit lower on screen
+    // and must render after (on top of) cells behind them
+    const orderedNodes = grid
+        .flat()
+        .sort((a, b) => (a.row + a.col) - (b.row + b.col));
+
     return (
         <div className="grid-wrapper">
-            <div className='grid'>
-                {grid.map((row, rowIndex) => {
+            <div className="grid" style={{ width: gridWidth, height: gridHeight }}>
+                {orderedNodes.map(node => {
+                    const { row, col, isStart, isEnd, isObstacle, isVisited, isCurrent, isPath, terrain } = node;
                     return (
-                        <div key={rowIndex} className='grid-row'>
-                            {row.map((node, nodeIndex) => {
-                                const { row, col, isStart, isEnd, isObstacle, isVisited, isCurrent, isPath, terrain } = node;
-                                return (
-                                    <Node
-                                        key={nodeIndex}
-                                        row={row}
-                                        col={col}
-                                        isStart={isStart}
-                                        isEnd={isEnd}
-                                        isObstacle={isObstacle}
-                                        isVisited={isVisited}
-                                        isCurrent={isCurrent}
-                                        isPath={isPath}
-                                        terrain={terrain}
-                                        onNodeClick={HandleNodeClick}
-                                    />
-                                );
-                            })}
-                        </div>
-                    )
+                        <Node
+                            key={`${row}-${col}`}
+                            row={row}
+                            col={col}
+                            isStart={isStart}
+                            isEnd={isEnd}
+                            isObstacle={isObstacle}
+                            isVisited={isVisited}
+                            isCurrent={isCurrent}
+                            isPath={isPath}
+                            terrain={terrain}
+                            originX={originX}
+                            onNodeClick={HandleNodeClick}
+                        />
+                    );
                 })}
             </div>
             {status && <p className="status-line">{status}</p>}
