@@ -4,7 +4,7 @@
     outline: 1px solid #555;
     display: inline-block;
     border-radius: 8px; /* Rounded squares */
-    transition: background-color 0.3s ease, border-radius 0.3s ease;
+    transition: background-color 0.25s cubic-bezier(0.22, 0.61, 0.36, 1), border-radius 0.25s cubic-bezier(0.22, 0.61, 0.36, 1), transform 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .node:hover {
@@ -13,38 +13,64 @@
 
 .node-visited {
     animation-name: visitedAnimation;
-    animation-duration: 0.7s;
-    animation-timing-function: ease-out;
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
     animation-delay: 0;
     animation-direction: alternate;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
     animation-play-state: running;
-    background-color: #ffc107; /* Amber */
+    background-color: #f0f0f0; /* White */
 }
 
 @keyframes visitedAnimation {
   0% {
     transform: scale(0.3);
-    background-color: #6f42c1; /* Purple */
+    background-color: #f0f0f0; /* White */
     border-radius: 100%;
   }
 
-  50% {
-    background-color: #007bff; /* Blue */
-  }
-
-  75% {
+  60% {
     transform: scale(1.2);
-    background-color: #28a745; /* Green */
+    background-color: #f0f0f0; /* White */
   }
 
   100% {
     transform: scale(1);
-    background-color: #ffc107; /* Amber */
+    background-color: #f0f0f0; /* White */
   }
 }
 
+.node-current {
+    animation-name: currentAnimation;
+    animation-duration: 0.4s;
+    animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+    animation-fill-mode: forwards;
+    background-color: #6f42c1; /* Purple */
+}
+
+@keyframes currentAnimation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Terrain Type Colors */
+.node-terrain-road { background-color: #222; }
+.node-terrain-grass { background-color: #2e7d32; }    /* Forest Green */
+.node-terrain-water { background-color: #0288d1; }    /* Ocean Blue */
+.node-terrain-mountain { background-color: #795548; } /* Earth Brown */
+.node-terrain-wall { background-color: #37474f; }     /* Impassable Slate */
+
+.node-obs {
+    background-color: #6c757d; /* Gray */
+}
 
 .node-start {
     background-color: #007bff; /* Blue */
@@ -54,14 +80,21 @@
     background-color: #dc3545; /* Red */
 }
 
-.node-obs {
-    background-color: #6c757d; /* Gray */
-}
-
 .node-shortest-path {
+    animation-name: pathAnimation;
+    animation-duration: 0.4s;
+    animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+    animation-fill-mode: forwards;
     background-color: #28a745; /* Green */
 }
 
-.node-current {
-    background-color: #6f42c1; /* Purple */
+@keyframes pathAnimation {
+  0% {
+    transform: scale(0.6);
+    background-color: #ffc107;
+  }
+  100% {
+    transform: scale(1);
+    background-color: #28a745; /* Green */
+  }
 }
